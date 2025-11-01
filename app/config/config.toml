@@ -1,7 +1,7 @@
 [database]
 # Use environment variable DATABASE_URL to override.
 # Format: postgresql+psycopg2://<user>:<password>@<host>:<port>/<dbname>
-url = "postgresql+psycopg2://postgres:<password>@localhost:5432/remote_workforce"
+url = "postgresql+psycopg2://postgres:tejas2027@localhost:5432/remote_workforce"
 
 [auth]
 # Simple admin passcode for demo (do NOT use in production)
