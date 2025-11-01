@@ -1,0 +1,5 @@
+/* Simple tweaks for metric cards and section spacing */
+.block-container { padding-top: 1.5rem; }
+.metric-card { border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 0.75rem; background: #fff; }
+.section-title { margin-top: 1rem; margin-bottom: 0.5rem; }
+.small-muted { color: #6b7280; font-size: 0.85rem; }
