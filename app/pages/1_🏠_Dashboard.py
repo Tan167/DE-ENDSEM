@@ -18,7 +18,6 @@ user = auth.current_user()
 
 st.title("Dashboard")
 
-# Filters
 colf1, colf2, colf3 = st.columns(3)
 with colf1:
     start = st.date_input("Start Date", value=date.today() - timedelta(days=30))
@@ -31,7 +30,6 @@ with colf3:
         dept_filter = ""
 
 with SessionLocal() as db:
-    # Employee view: productivity trend, attendance list, tasks progress
     if user["role"] != "admin":
         st.subheader("Your Productivity Trend")
         df_prod = crud.daily_average_productivity(db, employee_id=user["employee_id"], start=start, end=end)
@@ -68,7 +66,6 @@ with SessionLocal() as db:
             df_tasks["progress"] = df_tasks["status"].map({"Completed": 1.0, "In Progress": 0.5, "Pending": 0.1}).fillna(0.0)
         st.dataframe(df_tasks, use_container_width=True)
 
-    # Admin view: dept productivity, attendance heatmap, top performers
     else:
         st.subheader("Department Productivity")
         df_dept = crud.department_productivity(db, start=start, end=end)
@@ -76,20 +73,14 @@ with SessionLocal() as db:
             df_dept = df_dept[df_dept["department"].str.contains(dept_filter, case=False, na=False)]
         st.plotly_chart(dept_productivity_pie(df_dept), use_container_width=True)
 
-        st.subheader("Attendance Heatmap")
-        df_att = crud.attendance_summary(db, start=start, end=end, department_id=None)
-        employees = {e.employee_id: e.name for e in crud.list_employees(db)}
-        st.plotly_chart(attendance_heatmap(df_att, employees_map=employees), use_container_width=True)
 
         st.subheader("Top Performers")
         df_top = crud.top_performers(db, limit=5, start=start, end=end)
         st.dataframe(df_top, use_container_width=True)
 
-        # Alerts: Missing check-ins today and low productivity (last 7 days)
         st.subheader("Alerts")
         today = date.today()
         all_emps = crud.list_employees(db)
-        # Missing check-in today
         missing = []
         for e in all_emps:
             recs = crud.list_attendance(db, employee_id=e.employee_id, start=today, end=today)
@@ -98,7 +89,6 @@ with SessionLocal() as db:
         if missing:
             st.warning(f"Missing check-in today: {', '.join(missing[:10])}{' ...' if len(missing)>10 else ''}")
 
-        # Low productivity in last 7 days
         df_prod7 = crud.daily_average_productivity(db, employee_id=None, start=today - timedelta(days=7), end=today)
         if not df_prod7.empty and df_prod7['avg_productivity'].mean() < 50:
             st.error("Average productivity last 7 days is below 50.")

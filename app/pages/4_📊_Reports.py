@@ -33,7 +33,6 @@ with SessionLocal() as db:
             emp_choice = st.selectbox("Employee (optional)", ["All"] + list(emps.keys()))
             emp_filter = None if emp_choice == "All" else emps[emp_choice]
 
-    # KPIs
     st.subheader("KPIs")
     df_dept = crud.department_productivity(db, start=start, end=end)
     df_top = crud.top_performers(db, start=start, end=end)
@@ -43,11 +42,9 @@ with SessionLocal() as db:
     kpi_cols[1].metric("Top Performers Listed", len(df_top))
     kpi_cols[2].metric("Total Tasks", total_tasks)
 
-    # Time Series of Hours
     df_hours = crud.working_hours_timeseries(db, employee_id=emp_filter, start=start, end=end)
     st.plotly_chart(work_hours_timeseries(df_hours), use_container_width=True)
 
-    # Export section
     st.subheader("Export Data")
     tab1, tab2 = st.tabs(["CSV", "PDF"])
     with tab1:

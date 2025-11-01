@@ -15,7 +15,6 @@ def productivity_trend(df_daily: pd.DataFrame, title: str = "Daily Productivity"
 
 
 def attendance_heatmap(df_att: pd.DataFrame, employees_map: Optional[dict] = None, title: str = "Attendance Heatmap"):
-    # Expect columns: employee_id, date, status
     if df_att.empty:
         return px.imshow([[0]], labels=dict(color="Status"), title=title)
     df = df_att.copy()

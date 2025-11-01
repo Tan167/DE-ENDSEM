@@ -21,7 +21,6 @@ def login(email: str, role: str, passcode: Optional[str] = None, password: Optio
         if role == "admin":
             if passcode != settings.admin_passcode:
                 return False
-        # Employee role requires password verification
         if role == "employee":
             if user.role not in ("employee", "admin"):
                 return False

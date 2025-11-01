@@ -20,7 +20,6 @@ def generate_pdf_report(
     c = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
 
-    # Header
     c.setFont("Helvetica-Bold", 16)
     c.drawString(2 * cm, height - 2 * cm, title)
     c.setFont("Helvetica", 10)
@@ -39,7 +38,6 @@ def generate_pdf_report(
         if y < 3 * cm:
             c.showPage(); y = height - 2 * cm
 
-    # Sections tables
     for section, df in sections.items():
         y -= 0.4 * cm
         c.setFont("Helvetica-Bold", 12)
@@ -50,9 +48,7 @@ def generate_pdf_report(
             c.drawString(2.2 * cm, y, "(No data)")
             y -= 0.5 * cm
         else:
-            # Draw table-like rows (first few only)
             max_rows = 20
-            # Prepare text rows
             cols = list(df.columns)
             c.drawString(2.2 * cm, y, " | ".join(str(cn) for cn in cols))
             y -= 0.5 * cm

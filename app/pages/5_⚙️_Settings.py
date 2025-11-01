@@ -21,7 +21,6 @@ st.title("Admin Settings")
 
 with SessionLocal() as db:
     st.subheader("Departments")
-    # Create department
     with st.expander("Create Department"):
         dept_name = st.text_input("Department Name", key="create_dept_name")
         manager_name = st.text_input("Manager Name", key="create_dept_manager")
@@ -30,7 +29,6 @@ with SessionLocal() as db:
                 crud.create_department(db, dept_name, manager_name)
                 st.success("Department created.")
 
-    # List departments
     deps = crud.list_departments(db)
     df_deps = pd.DataFrame([{ "dept_id": d.dept_id, "dept_name": d.dept_name, "manager_name": d.manager_name } for d in deps])
     st.dataframe(df_deps, use_container_width=True)

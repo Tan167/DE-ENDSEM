@@ -26,8 +26,7 @@ def get_db():
 
 
 def init_db():
-    # Imported lazily to avoid circular imports
-    from db import models  # noqa: F401
+    from db import models  
     Base.metadata.create_all(bind=engine)
     _ensure_optional_columns()
 
@@ -43,5 +42,4 @@ def _ensure_optional_columns():
             with engine.begin() as conn:
                 conn.execute(text('ALTER TABLE employees ADD COLUMN password_hash VARCHAR(255)'))
     except Exception:
-        # Best-effort; avoid crashing app on migration issues.
         pass

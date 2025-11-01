@@ -17,7 +17,6 @@ from utils.security import hash_password
 settings = load_settings()
 
 
-# ---------------------- Employees ----------------------
 
 def list_employees(db: Session, department_id: Optional[int] = None) -> List[Employee]:
     stmt = select(Employee).order_by(Employee.name)
@@ -50,7 +49,6 @@ def update_employee(db: Session, employee_id: int, **kwargs) -> Optional[Employe
     emp = get_employee(db, employee_id)
     if not emp:
         return None
-    # Handle password separately
     password = kwargs.pop('password', None)
     for k, v in kwargs.items():
         if hasattr(emp, k) and v is not None:
@@ -71,7 +69,6 @@ def delete_employee(db: Session, employee_id: int) -> bool:
     return True
 
 
-# ---------------------- Departments ----------------------
 
 def list_departments(db: Session) -> List[Department]:
     return list(db.execute(select(Department).order_by(Department.dept_name)).scalars())
@@ -109,7 +106,6 @@ def delete_department(db: Session, dept_id: int) -> bool:
     return True
 
 
-# ---------------------- Attendance ----------------------
 
 def get_or_create_attendance(db: Session, employee_id: int, on_date: date) -> Attendance:
     att = db.execute(
@@ -170,7 +166,6 @@ def working_hours_timeseries(db: Session, employee_id: Optional[int], start: dat
     return df
 
 
-# ---------------------- Tasks ----------------------
 
 def list_tasks(
     db: Session,
@@ -233,7 +228,6 @@ def delete_task(db: Session, task_id: int) -> bool:
     return True
 
 
-# ---------------------- Analytics ----------------------
 
 def department_productivity(db: Session, start: Optional[date] = None, end: Optional[date] = None) -> pd.DataFrame:
     """Average productivity score by department."""

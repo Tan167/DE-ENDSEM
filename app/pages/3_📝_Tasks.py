@@ -42,11 +42,11 @@ with SessionLocal() as db:
             start_time = datetime_picker("Start Time")
         with col2:
             end_time = datetime_picker("End Time")
-        status = st.selectbox("Status", ["Pending", "In Progress", "Completed"])
-        pscore = st.number_input("Productivity Score", min_value=0.0, max_value=100.0, value=0.0)
-        if st.button("Create Task", type="primary"):
-            crud.create_task(db, employee_id, task_name, start_time, end_time, status, pscore)
-            st.success("Task created.")
+            status = st.selectbox("Status", ["Pending", "In Progress", "Completed"], key="create_task_status")
+            pscore = st.number_input("Productivity Score", min_value=0.0, max_value=100.0, value=0.0, key="create_task_pscore")
+            if st.button("Create Task", type="primary"):
+                crud.create_task(db, employee_id, task_name, start_time, end_time, status, pscore)
+                st.success("Task created.")
 
     st.subheader("My Tasks" if user["role"] != "admin" else "All Tasks")
     employee_id = user["employee_id"] if user["role"] != "admin" else None
@@ -68,9 +68,9 @@ with SessionLocal() as db:
     st.subheader("Update Task")
     if not df.empty:
         task_ids = df["task_id"].tolist()
-        t_id = st.selectbox("Task ID", task_ids)
-        new_status = st.selectbox("New Status", ["Pending", "In Progress", "Completed"])    
-        new_pscore = st.number_input("Productivity Score", min_value=0.0, max_value=100.0, value=0.0)
+        t_id = st.selectbox("Task ID", task_ids, key="update_task_id")
+        new_status = st.selectbox("New Status", ["Pending", "In Progress", "Completed"], key=f"update_task_status_{t_id}")
+        new_pscore = st.number_input("Productivity Score", min_value=0.0, max_value=100.0, value=0.0, key=f"update_task_pscore_{t_id}")
         if st.button("Update", type="primary"):
             crud.update_task(db, t_id, status=new_status, productivity_score=new_pscore)
             st.success("Task updated.")
@@ -78,7 +78,7 @@ with SessionLocal() as db:
     if user["role"] == "admin":
         st.subheader("Delete Task")
         if not df.empty:
-            t_id2 = st.selectbox("Task ID to Delete", df["task_id"].tolist(), key="del")
+            t_id2 = st.selectbox("Task ID to Delete", df["task_id"].tolist(), key="delete_task_id")
             if st.button("Delete", type="secondary"):
                 crud.delete_task(db, t_id2)
                 st.warning("Task deleted.")
