@@ -43,7 +43,7 @@ with SessionLocal() as db:
     kpi_cols[2].metric("Total Tasks", total_tasks)
 
     df_hours = crud.working_hours_timeseries(db, employee_id=emp_filter, start=start, end=end)
-    st.plotly_chart(work_hours_timeseries(df_hours), use_container_width=True)
+    st.plotly_chart(work_hours_timeseries(df_hours), width='stretch')
 
     st.subheader("Export Data")
     tab1, tab2 = st.tabs(["CSV", "PDF"])

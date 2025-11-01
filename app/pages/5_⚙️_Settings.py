@@ -31,7 +31,7 @@ with SessionLocal() as db:
 
     deps = crud.list_departments(db)
     df_deps = pd.DataFrame([{ "dept_id": d.dept_id, "dept_name": d.dept_name, "manager_name": d.manager_name } for d in deps])
-    st.dataframe(df_deps, use_container_width=True)
+    st.dataframe(df_deps, width='stretch')
 
     st.divider()
 
@@ -61,7 +61,7 @@ with SessionLocal() as db:
         }
         for e in emps
     ])
-    st.dataframe(df_emps, use_container_width=True)
+    st.dataframe(df_emps, width='stretch')
 
     st.subheader("Edit/Delete Employee")
     if not df_emps.empty:

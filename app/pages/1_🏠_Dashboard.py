@@ -34,7 +34,7 @@ with SessionLocal() as db:
         st.subheader("Your Productivity Trend")
         df_prod = crud.daily_average_productivity(db, employee_id=user["employee_id"], start=start, end=end)
         fig = productivity_trend(df_prod)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
         st.subheader("Recent Attendance")
         att = crud.list_attendance(db, employee_id=user["employee_id"], start=start, end=end)
@@ -47,7 +47,7 @@ with SessionLocal() as db:
             }
             for a in att
         ])
-        st.dataframe(df_att, use_container_width=True)
+        st.dataframe(df_att, width='stretch')
 
         st.subheader("Your Tasks")
         tasks = crud.list_tasks(db, employee_id=user["employee_id"]) 
@@ -64,19 +64,18 @@ with SessionLocal() as db:
         ])
         if not df_tasks.empty:
             df_tasks["progress"] = df_tasks["status"].map({"Completed": 1.0, "In Progress": 0.5, "Pending": 0.1}).fillna(0.0)
-        st.dataframe(df_tasks, use_container_width=True)
+        st.dataframe(df_tasks, width='stretch')
 
     else:
         st.subheader("Department Productivity")
         df_dept = crud.department_productivity(db, start=start, end=end)
         if dept_filter:
             df_dept = df_dept[df_dept["department"].str.contains(dept_filter, case=False, na=False)]
-        st.plotly_chart(dept_productivity_pie(df_dept), use_container_width=True)
-
+        st.plotly_chart(dept_productivity_pie(df_dept), width='stretch')
 
         st.subheader("Top Performers")
         df_top = crud.top_performers(db, limit=5, start=start, end=end)
-        st.dataframe(df_top, use_container_width=True)
+        st.dataframe(df_top, width='stretch')
 
         st.subheader("Alerts")
         today = date.today()

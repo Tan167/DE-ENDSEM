@@ -63,7 +63,7 @@ with SessionLocal() as db:
         }
         for t in tasks
     ])
-    st.dataframe(df, use_container_width=True)
+    st.dataframe(df, width='stretch')
 
     st.subheader("Update Task")
     if not df.empty:
