@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: remote_workforce
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres" 
+          --health-interval=10s 
+          --health-timeout=5s 
+          --health-retries=5
+
+    env:
+      # Point the app at the CI Postgres service
+      DATABASE_URL: postgresql+psycopg2://postgres:postgres@localhost:5432/remote_workforce
+      PYTHONPATH: ./app
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install system deps for psycopg2
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpq-dev build-essential
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          # Lightweight tooling used only in CI
+          pip install flake8
+
+      - name: Lint (flake8)
+        run: |
+          flake8 app --count --select=E9,F63,F7,F82 --show-source --statistics || true
+          flake8 app --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics || true
+
+      - name: Wait for Postgres
+        run: |
+          for i in {1..30}; do
+            nc -z 127.0.0.1 5432 && echo "Postgres is up" && break
+            echo "Waiting for Postgres..."; sleep 2
+          done
+
+      - name: Initialize database schema
+        run: |
+          python scripts/bootstrap_db.py
+
+      - name: Smoke test imports and minimal DB query
+        run: |
+          python - << 'PY'
+          import os, sys
+          sys.path.insert(0, 'app')
+          from db.database import SessionLocal, init_db
+          from db.models import Task
+          from sqlalchemy import select, func
+          init_db()
+          with SessionLocal() as s:
+              cnt = s.execute(select(func.count()).select_from(Task)).scalar()
+              print('TASK_COUNT', cnt)
+          PY
+
+      - name: Streamlit entrypoint import check
+        run: |
+          python - << 'PY'
+          import os, sys
+          sys.path.insert(0, 'app')
+          import Home
+          print('Home imported OK')
+          PY
